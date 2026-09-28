@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>잠깐, 다시 여기로 · 다시, 여기</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="src/blocked.js"></script>
+  </head>
+  <body class="blocked-page">
+    <header class="blocked-header">
+      <a class="brand" href="options.html"
+        ><img src="assets/mark.svg" width="36" height="36" alt="" /><span
+          >다시, 여기</span
+        ></a
+      ><span class="blocked-status" id="blocked-status"
+        ><i></i> 나를 위한 잠깐의 멈춤</span
+      >
+    </header>
+    <main class="return-space">
+      <span class="eyebrow">TAKE A BREATH. COME BACK TO YOU.</span>
+      <div class="return-art" aria-hidden="true">
+        <span class="art-orbit"></span><span class="art-arch"></span
+        ><span class="art-ball"></span><span class="art-ground"></span
+        ><span class="art-star">✧</span><span class="art-spark">✳</span>
+      </div>
+      <span id="blocked-site" class="domain-pill">나를 위한 한 문장</span>
+      <p class="return-kicker">잠깐, 지금의 나에게 도착한 문장</p>
+      <h1 id="return-message">
+        지금의 작은 집중이<br />내가 바라던 내일을 만들어요.
+      </h1>
+      <p class="return-note">
+        다른 곳을 향하던 마음을, 다시 여기로.<br />알아차린 지금부터 다시
+        시작하면 돼요.
+      </p>
+      <button id="return-button" class="button primary">
+        새 탭에서 다시 시작하기 <span>↗</span></button
+      ><a href="options.html" class="return-settings"
+        >나의 문장과 사이트 설정</a
+      >
+    </main>
+    <footer class="blocked-footer">
+      <span class="footer-flower" aria-hidden="true">✳</span
+      ><span>나의 주의를, 내가 소중히 여기는 곳에.</span
+      ><span id="preview-note"></span>
+    </footer>
+    <div id="notice" class="notice" role="status" hidden></div>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>다시, 여기</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="src/popup.js"></script>
+  </head>
+  <body class="popup-page">
+    <header class="popup-header">
+      <a class="brand" href="options.html" target="_blank"
+        ><img src="assets/mark.svg" width="34" height="34" alt="" /><span
+          >다시, 여기</span
+        ></a
+      ><button id="settings" class="icon-button" aria-label="설정 열기">
+        ⚙
+      </button>
+    </header>
+    <main>
+      <section class="popup-focus">
+        <div>
+          <span class="eyebrow">ONE THING AT A TIME</span>
+          <h1 id="focus-heading">잠시만 기다려 주세요</h1>
+          <p id="focus-description">설정을 불러오고 있어요.</p>
+        </div>
+        <input
+          class="switch"
+          id="focus-toggle"
+          type="checkbox"
+          aria-label="집중 모드"
+          disabled
+        />
+      </section>
+      <section class="popup-message">
+        <span class="quote-mark" aria-hidden="true">“</span>
+        <p id="popup-message">나에게 보내는 한 문장</p>
+        <span>내가 나에게 건네는 말</span>
+      </section>
+      <button id="block-current" class="button primary full" disabled>
+        현재 사이트 차단하기 <span>＋</span>
+      </button>
+      <p id="current-domain" class="current-domain">
+        현재 탭을 확인하고 있어요.
+      </p>
+      <button id="manage" class="popup-manage">
+        <span>사이트와 문구 설정</span><span id="active-count">↗</span>
+      </button>
+    </main>
+    <footer>작은 멈춤이, 더 깊은 집중으로.</footer>
+    <div id="notice" class="popup-notice" role="status" hidden></div>
+  </body>
+</html>

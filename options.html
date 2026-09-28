@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>나의 집중 공간 · 다시, 여기</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="src/options.js"></script>
+  </head>
+  <body class="options-page">
+    <header class="site-header">
+      <a class="brand" href="options.html"
+        ><img src="assets/mark.svg" width="38" height="38" alt="" /><span
+          >다시, 여기<small>A LITTLE PAUSE, A BETTER FOCUS</small></span
+        ></a
+      >
+      <div class="header-right">
+        <span class="local-note"><i></i> 나의 기기에만 저장돼요</span
+        ><button class="button outline" id="open-preview">
+          차단 화면 미리보기 <span>↗</span>
+        </button>
+      </div>
+    </header>
+    <main class="workspace">
+      <section class="intro">
+        <div>
+          <span class="eyebrow">MY FOCUS SPACE</span>
+          <h1>마음이 새는 순간,<br />다시 나에게 돌아오도록.</h1>
+          <p>
+            잠깐의 멈춤과 나에게 건네는 한 문장.<br class="mobile-only" />
+            집중하기 좋은 작은 환경을 만들어 보세요.
+          </p>
+        </div>
+        <div class="intro-doodle" aria-hidden="true">
+          <span class="orbit"></span><span class="sun"></span
+          ><span class="doodle-star">✧</span
+          ><span class="doodle-note">one thing at a time.</span>
+        </div>
+      </section>
+      <section class="focus-banner">
+        <div class="focus-symbol" aria-hidden="true">◌</div>
+        <div class="focus-copy">
+          <h2 id="focus-heading">나의 집중을 준비하고 있어요</h2>
+          <p id="focus-description">설정을 불러오는 중이에요.</p>
+        </div>
+        <label class="switch-label"
+          ><span id="focus-label">집중 모드</span
+          ><input
+            class="switch"
+            id="focus-toggle"
+            type="checkbox"
+            aria-label="집중 모드"
+            disabled
+        /></label>
+      </section>
+      <div class="settings-grid">
+        <section class="panel message-panel">
+          <div class="section-top">
+            <span class="step">01</span>
+            <div>
+              <h2>나에게 건네는 한 문장</h2>
+              <p>다른 길로 새려는 순간, 이 문장이 나를 기다려요.</p>
+            </div>
+            <span aria-hidden="true" class="section-icon">✎</span>
+          </div>
+          <form id="message-form">
+            <label class="field-label" for="message">다시 집중할 나에게</label
+            ><textarea
+              id="message"
+              maxlength="240"
+              rows="4"
+              placeholder="지금 내가 집중하고 싶은 이유는 무엇인가요?"
+              disabled
+            ></textarea>
+            <div class="textarea-foot">
+              <span>다정하게, 혹은 단호하게. 나다운 말이면 충분해요.</span
+              ><span id="char-count">0 / 240</span>
+            </div>
+            <div class="suggestions">
+              <span>문장이 떠오르지 않는다면</span
+              ><button
+                type="button"
+                data-message="지금의 작은 집중이&#10;내가 바라던 내일을 만들어요."
+              >
+                내일의 나에게</button
+              ><button
+                type="button"
+                data-message="잠깐, 지금 하려던 일이 뭐였지?&#10;딱 하나만 마무리하고 돌아오자."
+              >
+                부드러운 리마인드</button
+              ><button
+                type="button"
+                data-message="잘하고 있어.&#10;다시 시작하면 그걸로 충분해."
+              >
+                따뜻한 응원
+              </button>
+            </div>
+            <div class="save-row">
+              <span id="save-state">불러오는 중</span
+              ><button class="button primary" id="save-message" disabled>
+                문구 저장하기 <span>↗</span>
+              </button>
+            </div>
+          </form>
+        </section>
+        <aside class="preview-panel">
+          <div class="preview-top">
+            <span class="eyebrow">A MOMENT TO RETURN</span
+            ><span class="preview-label">미리보기</span>
+          </div>
+          <div class="mini-art" aria-hidden="true">
+            <span class="art-arch"></span><span class="art-ball"></span
+            ><span class="art-ground"></span><span class="art-star">✧</span>
+          </div>
+          <p class="preview-kicker">괜찮아요, 다시 시작하면 돼요.</p>
+          <blockquote id="preview-message">
+            지금의 작은 집중이<br />내가 바라던 내일을 만들어요.
+          </blockquote>
+          <span class="preview-line"></span>
+          <p class="preview-caption">다른 곳을 향하던 마음을, 다시 여기로.</p>
+        </aside>
+        <section class="panel sites-panel">
+          <div class="section-top">
+            <span class="step">02</span>
+            <div>
+              <h2>
+                잠시 거리를 둘 사이트
+                <span id="site-count" class="count">0</span>
+              </h2>
+              <p>무심코 열게 되는 사이트를 여기에 적어 주세요.</p>
+            </div>
+          </div>
+          <form id="site-form" class="site-form">
+            <label class="sr-only" for="site-input">차단할 사이트 주소</label
+            ><span aria-hidden="true">◎</span
+            ><input
+              id="site-input"
+              type="text"
+              inputmode="url"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="예: youtube.com 또는 사이트 주소 붙여넣기"
+              maxlength="2048"
+              disabled
+            /><button class="button primary" id="add-site" disabled>
+              + 추가
+            </button>
+          </form>
+          <div class="quick-add">
+            <span>자주 찾는 사이트</span
+            ><button data-domain="youtube.com">+ YouTube</button
+            ><button data-domain="instagram.com">+ Instagram</button
+            ><button data-domain="x.com">+ X</button>
+          </div>
+          <div id="sites-empty" class="sites-empty">
+            <span aria-hidden="true">⌁</span>
+            <p>내 시간을 지켜줄 첫 번째 경계</p>
+            <small>사이트를 추가하면, 나의 문장이 대신 맞이해요.</small>
+          </div>
+          <ul
+            id="site-list"
+            class="site-list"
+            aria-label="차단 사이트 목록"
+          ></ul>
+          <div class="panel-note">
+            <span aria-hidden="true">ⓘ</span>
+            <p>
+              사이트 전체와 하위 도메인을 함께 차단해요. 집중 모드를 켜면 이미
+              열린 대상 탭도 전환돼요.
+            </p>
+          </div>
+        </section>
+        <aside class="gentle-note">
+          <span aria-hidden="true">✳</span>
+          <h3>완벽한 집중이 아니어도 괜찮아요.</h3>
+          <p>
+            마음이 다른 곳으로 향했다면,<br />알아차린 지금이 다시 시작할
+            순간이에요.
+          </p>
+          <div class="note-rule"></div>
+          <span class="note-sign">나의 속도로, 한 번에 하나씩.</span>
+        </aside>
+      </div>
+      <footer class="site-footer">
+        <span>나의 주의를, 내가 소중히 여기는 곳에.</span
+        ><span>다시, 여기 <span aria-hidden="true">↶</span></span>
+      </footer>
+    </main>
+    <div id="notice" class="notice" role="status" hidden></div>
+  </body>
+</html>

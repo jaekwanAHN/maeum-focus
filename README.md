@@ -1,0 +1,82 @@
+# 다시, 여기
+
+무심코 다른 사이트를 열었을 때, 내가 적어 둔 한 문장으로 다시 집중하도록 돕는 Chrome 확장프로그램입니다.
+
+## 설치 — 빌드 없이 바로 사용
+
+1. Chrome 주소창에 `chrome://extensions`를 입력합니다.
+2. 오른쪽 위 **개발자 모드**를 켭니다.
+3. **압축해제된 확장 프로그램을 로드합니다**를 누릅니다.
+4. 이 프로젝트의 `maeum-focus` 폴더를 선택합니다. ZIP을 받았다면 먼저 압축을 풀고 `manifest.json`이 있는 폴더를 선택합니다.
+5. 도구 모음의 퍼즐 아이콘에서 **다시, 여기**를 고정합니다.
+6. 확장프로그램 아이콘 → **사이트와 문구 설정**에서 나만의 문구와 사이트를 추가합니다.
+
+Chrome 120 이상을 대상으로 하는 Manifest V3 확장프로그램입니다. 스토어 게시 없이 개발자 모드로 설치할 수 있습니다. 스토어 등록·서명된 CRX 배포는 포함하지 않습니다.
+
+## 기능
+
+- 사이트 도메인 또는 URL을 입력해 차단 목록에 추가
+- `youtube.com` 등록 시 `www.youtube.com`, `m.youtube.com` 등 하위 도메인과 모든 경로 차단
+- 문구 직접 작성·저장 및 3가지 예시 문장
+- 입력 중 실시간 문구 미리보기와 저장된 문구의 전체 화면 미리보기
+- 집중 모드 전체 켜기·끄기와 개별 사이트 차단 켜기·끄기·삭제
+- 확장프로그램 팝업에서 현재 사이트 바로 추가
+- 집중 모드 활성화·사이트 추가 시 이미 열린 대상 탭도 안내 화면으로 전환
+- 차단 안내에서 안전하게 새 탭으로 돌아가기
+- 브라우저를 다시 열어도 설정과 차단 규칙 유지
+- 외부 폰트·분석 도구·서버 없는 로컬 실행
+
+기본 문구와 빈 사이트 목록으로 시작합니다. 사용자가 등록하기 전까지 어떤 사이트도 차단하지 않습니다. 차단은 일반 HTTP/HTTPS 사이트의 최상위 페이지 이동에 적용하며, 페이지 안의 이미지·API·iframe 요청까지 차단하지 않습니다. 특정 경로만 차단하는 기능은 없고 입력한 URL의 호스트 전체를 대상으로 합니다. `www.`는 제거하고 저장합니다. 최대 200개 사이트, 문구 240자를 지원합니다.
+
+## 권한과 저장
+
+- `storage`: 사이트 목록, 문구, 집중 모드 상태를 현재 Chrome 프로필에 저장합니다.
+- `declarativeNetRequestWithHostAccess`: 등록한 도메인으로 가는 페이지 요청을 확장프로그램 안내 화면으로 리디렉션합니다.
+- `http://*/*`, `https://*/*`: 사용자가 어떤 사이트든 등록하고 리디렉션할 수 있도록 요청합니다. 설정 변경 시 현재 열린 탭의 주소를 일시적으로 확인해 이미 열린 차단 대상도 전환합니다.
+
+주소를 수집해 저장하거나 서버에 전송하지 않습니다. 콘텐츠 스크립트는 없으며 페이지 본문·입력값·비밀번호를 읽지 않습니다. Chrome 설치 화면에는 위 사이트 접근 권한에 대한 경고가 표시될 수 있습니다. 사이트 접근 권한을 일부로 제한하면 그 외 사이트의 차단이 동작하지 않을 수 있습니다.
+
+설정은 `chrome.storage.local`의 `settings` 키에 저장합니다. 다른 기기와 자동 동기화하지 않으며 확장프로그램을 삭제하면 설정도 삭제됩니다. 세부 사항은 [PRIVACY.md](PRIVACY.md)를 참고하세요.
+
+## 동작 원리
+
+`src/model.js`가 도메인 정규화·설정 검증·차단 규칙을 담당합니다. 서비스 워커는 변경 요청을 순서대로 처리하고 `chrome.declarativeNetRequest.updateDynamicRules`로 규칙을 적용합니다. Chrome이 직접 요청을 리디렉션하므로 서비스 워커가 쉬고 있어도 이후 접속에 차단이 적용됩니다.
+
+차단 화면 URL에는 등록된 도메인만 포함되며 원래 페이지 경로·검색어는 넘기지 않습니다. 사용자 문구와 도메인은 `textContent`로 표시합니다. 외부 코드나 HTML을 실행하지 않습니다. 규칙 갱신 또는 저장 실패 시 UI에 오류를 표시하며, 저장 실패 시 이전 규칙으로 되돌립니다.
+
+사이트를 닫거나 기능을 비활성화하면 우회할 수 있는 자기 관리용 도구입니다. 이미 열린 사이트의 같은 문서 내 이동(SPA), 다운로드, 시크릿 모드 기본 설정 등 모든 브라우저 사용을 감시하는 제품은 아닙니다. 다른 확장프로그램의 차단 규칙이 우선하면 이 안내 화면 대신 브라우저의 차단 오류가 나타날 수 있습니다. 시크릿 창에서는 Chrome의 **시크릿 모드에서 허용** 설정을 별도로 켜야 합니다.
+
+## 개발과 검증
+
+런타임 의존성이나 빌드 단계는 없습니다. HTML/CSS/JavaScript를 수정하고 `chrome://extensions`에서 새로고침하면 됩니다.
+
+```bash
+npm install
+npm run check
+npm test
+npx playwright install chromium
+npm run test:browser
+npm run package
+```
+
+- `npm run check`: JavaScript 문법, manifest 파일 경로, 인라인 스크립트 금지 검사
+- `npm test`: 도메인 정규화, 하위 도메인 경계, 중복·입력 검증, 규칙, 상태 검증
+- `npm run test:browser`: 임시 Chromium 프로필에 확장프로그램을 실제 설치하고 로컬 HTTP 서버로 차단 흐름 확인. 브라우저 재시작 후 저장된 설정·규칙도 검증합니다. 테스트 프로필은 종료 후 삭제합니다.
+- 스크린샷: `test-results/options.png`, `blocked.png`, `popup.png`, `options-mobile.png`
+- 배포 ZIP: `dist/maeum-focus-1.0.0.zip` (의존성·테스트·개발 파일 제외)
+- 아이콘 재생성: `node tools/icons.mjs` (직접 작성한 SVG를 PNG로 렌더링)
+
+## 파일 구성
+
+| 파일                             | 역할                             |
+| -------------------------------- | -------------------------------- |
+| `manifest.json`                  | Manifest V3 설정과 권한          |
+| `options.html`, `src/options.js` | 문구·사이트 설정                 |
+| `popup.html`, `src/popup.js`     | 도구 모음 팝업                   |
+| `blocked.html`, `src/blocked.js` | 차단 안내 화면                   |
+| `src/background.js`              | 설정 저장·규칙 갱신·탭 전환      |
+| `src/model.js`                   | 순수 도메인·상태·규칙 로직       |
+| `src/client.js`                  | 확장프로그램 페이지 간 공통 통신 |
+| `style.css`                      | 따뜻한 색감의 반응형 UI          |
+
+공식 문서: [Chrome declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest), [확장프로그램 E2E 테스트](https://developer.chrome.com/docs/extensions/how-to/test/end-to-end-testing).
