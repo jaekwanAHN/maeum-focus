@@ -9,8 +9,8 @@ function render(next) {
   const active = state.sites.filter((s) => s.enabled).length;
   $("#focus-toggle").checked = state.enabled;
   $("#focus-heading").textContent = state.enabled
-    ? "지금은, 집중할 시간"
-    : "잠시 쉬어가는 중";
+    ? "사이트 차단 켜짐"
+    : "사이트 차단 꺼짐";
   $("#focus-description").textContent = state.enabled
     ? `${active}개의 사이트와 잠시 거리를 두고 있어요.`
     : "준비되면 집중 모드를 다시 켜 주세요.";

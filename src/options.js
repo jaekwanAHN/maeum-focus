@@ -20,8 +20,8 @@ function render(next) {
   const active = state.sites.filter((s) => s.enabled).length;
   $("#focus-toggle").checked = state.enabled;
   $("#focus-heading").textContent = state.enabled
-    ? "지금은, 나에게 집중하는 시간"
-    : "잠시 쉬어가는 중이에요";
+    ? "사이트 차단이 켜져 있어요"
+    : "사이트 차단이 꺼져 있어요";
   $("#focus-description").textContent = state.enabled
     ? active
       ? `${active}개의 사이트로 향하는 발걸음을 잠시 멈춰 드릴게요.`

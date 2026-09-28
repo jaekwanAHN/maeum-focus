@@ -1,3 +1,4 @@
+import { notificationIcon } from "../src/notification-icon.js";
 import { readdir, readFile, access } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 for (const name of await readdir("src"))
@@ -14,7 +15,7 @@ for (const path of [
   ...manifest.web_accessible_resources.flatMap((r) => r.resources),
 ])
   await access(path);
-for (const name of ["options.html", "blocked.html", "popup.html"]) {
+for (const name of ["options.html", "blocked.html", "popup.html", "offscreen.html"]) {
   const html = await readFile(name, "utf8");
   if (/<script(?![^>]*\bsrc=)/i.test(html) || /\son\w+=/i.test(html))
     throw new Error(
@@ -26,4 +27,7 @@ for (const name of ["options.html", "blocked.html", "popup.html"]) {
       await access(target.split("?")[0]);
   }
 }
+const notificationPng = Buffer.from(notificationIcon.split(",")[1], "base64");
+if (!notificationPng.equals(await readFile("assets/icon-128.png")))
+  throw new Error("Notification icon is out of date; run node tools/icons.mjs");
 console.log("JavaScript syntax, manifest assets and HTML CSP checks passed.");

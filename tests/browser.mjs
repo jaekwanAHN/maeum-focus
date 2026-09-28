@@ -16,6 +16,16 @@ const server = createServer((req, res) => {
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const port = server.address().port;
 let context;
+const runtimeErrors = [];
+function observeRuntime(context) {
+  context.on("console", message => {
+    if (message.type() === "error") {
+      runtimeErrors.push(message.text());
+      console.error("EXTENSION CONSOLE:", message.text());
+    }
+  });
+  context.on("weberror", event => runtimeErrors.push(event.error().message));
+}
 try {
   context = await chromium.launchPersistentContext(profile, {
     channel: "chromium",
@@ -28,6 +38,7 @@ try {
       "--no-proxy-server",
     ],
   });
+  observeRuntime(context);
   let worker = context.serviceWorkers()[0];
   if (!worker) worker = await context.waitForEvent("serviceworker");
   const id = new URL(worker.url()).host;
@@ -97,7 +108,7 @@ try {
     .getByRole("checkbox", { name: "example.test 차단", exact: true })
     .check();
   await expect(target).toHaveURL(`${base}/blocked.html?site=example.test`);
-  const popup = await context.newPage();
+  let popup = await context.newPage();
   await popup.goto(`${base}/popup.html`);
   await expect(
     popup.getByRole("checkbox", { name: "집중 모드", exact: true }),
@@ -121,6 +132,56 @@ try {
   ).toBeVisible();
   await popup.getByRole("checkbox", { name: "집중 모드", exact: true }).check();
   await expect(target).toHaveURL(`${base}/blocked.html?site=example.test`);
+  await expect(popup.locator("#timer-start")).toBeEnabled();
+  await popup.locator("#timer-focus").fill("1");
+  await popup.locator("#timer-rest").fill("1");
+  await popup.locator("#timer-sets").fill("2");
+  await popup.locator("#timer-start").click();
+  await expect(popup.locator("#timer-status")).toHaveText("집중 중 · 1/2세트");
+  await expect(options.locator("#timer-status")).toHaveText("집중 중 · 1/2세트");
+  await popup.locator("#timer-pause").click();
+  await expect(popup.locator("#timer-status")).toContainText("일시정지");
+  await popup.reload();
+  await expect(popup.locator("#timer-status")).toContainText("일시정지");
+  await popup.locator("#timer-pause").click();
+  await expect(popup.locator("#timer-status")).toHaveText("집중 중 · 1/2세트");
+  await popup.locator("#timer-alarm-time").fill("23:59");
+  await popup.locator("#timer-alarm-save").click();
+  await expect(popup.locator("#timer-alarm-status")).toContainText("울려요");
+  await popup.locator("#timer-cancel").click();
+  await expect(popup.locator("#timer-alarm-status")).toContainText("예약된 알람이 없어요");
+  await popup.locator(".timer-settings summary").click();
+  await popup.locator("#timer-hide").check();
+  await popup.locator("#timer-save").click();
+  await expect(popup.locator("#timer-clock")).toBeHidden();
+  for (const sound of ["chime", "beep", "school"]) {
+    await popup.locator("#timer-sound-type").selectOption(sound);
+    await popup.locator("#timer-preview").click();
+    await expect(popup.locator("#timer-feedback")).toHaveText("알림음을 재생했어요.");
+    await expect(popup.locator("#timer-preview")).toBeEnabled();
+    await expect(popup.locator("#timer-sound-type")).toHaveValue(sound);
+  }
+  assert.equal(await worker.evaluate(async () => (await chrome.storage.local.get("timer")).timer.preferences.soundType), "chime", "Preview does not save draft");
+  await popup.locator("#timer-save").click();
+  await expect(options.locator("#timer-sound-type")).toHaveValue("school");
+  await popup.reload();
+  await expect(popup.locator("#timer-sound-type")).toHaveValue("school");
+  // Real alarms event while popup is closed, with a shortened persisted deadline.
+  await popup.close();
+  await worker.evaluate(async () => {
+    const { timer } = await chrome.storage.local.get("timer");
+    timer.session.endsAt = Date.now() + 800;
+    await chrome.storage.local.set({ timer });
+    await chrome.alarms.create("focus-timer-wake", { when: timer.session.endsAt });
+  });
+  await expect(options.locator("#timer-status")).toHaveText("휴식 중 · 1/2세트", { timeout: 15000 });
+  await expect.poll(() => worker.evaluate(async () => Boolean((await chrome.notifications.getAll())["focus-timer-notice"]))).toBe(true);
+  await options.locator("#timer-stop").click();
+  await expect(options.locator("#timer-status")).toContainText("준비되면");
+  assert.equal(await worker.evaluate(() => chrome.alarms.get("focus-timer-wake")), undefined);
+  popup = await context.newPage();
+  await popup.goto(`${base}/popup.html`);
+  console.log("PASS: timer start, pause, resume, settings, alarm cancel, audio and closed-popup transition");
   await popup.setViewportSize({ width: 360, height: 650 });
   await popup.screenshot({ path: "test-results/popup.png", fullPage: true });
   console.log(
@@ -130,7 +191,7 @@ try {
     .getByRole("textbox", { name: "차단할 사이트 주소" })
     .fill("example.test");
   await options.getByRole("button", { name: "+ 추가", exact: true }).click();
-  await expect(options.getByRole("status")).toHaveText(
+  await expect(options.locator("#notice")).toHaveText(
     "이미 목록에 있는 사이트예요.",
   );
   await options.getByRole("textbox", { name: "차단할 사이트 주소" }).fill("");
@@ -219,6 +280,13 @@ try {
     .click();
   await expect(options.getByText("quick.test", { exact: true })).toHaveCount(0);
   console.log("PASS: popup current-site quick add and immediate redirect");
+  // Persist an active session and independent alarm across full browser restart.
+  await options.locator("#timer-start").click();
+  await expect(options.locator("#timer-status")).toContainText("집중 중");
+  await options.locator("#timer-alarm-time").fill("23:59");
+  await options.locator("#timer-alarm-save").click();
+  await expect(options.locator("#timer-alarm-status")).toContainText("울려요");
+  const timerBeforeRestart = await worker.evaluate(async () => (await chrome.storage.local.get("timer")).timer);
   assert.deepEqual(errors, []);
   await context.close();
   context = null;
@@ -230,6 +298,7 @@ try {
       `--load-extension=${extension}`,
     ],
   });
+  observeRuntime(context);
   worker =
     context.serviceWorkers()[0] ||
     (await context.waitForEvent("serviceworker"));
@@ -245,9 +314,19 @@ try {
   );
   assert.equal(persisted.settings.sites.length, 3);
   assert.equal(persisted.settings.enabled, true);
+  const restored = await context.newPage();
+  await restored.goto(`${base}/popup.html`);
+  await expect(restored.locator("#timer-status")).toContainText("집중 중");
+  const timerAfterRestart = await worker.evaluate(async () => (await chrome.storage.local.get("timer")).timer);
+  assert.equal(timerAfterRestart.session.endsAt, timerBeforeRestart.session.endsAt);
+  assert.equal(timerAfterRestart.alarm.at, timerBeforeRestart.alarm.at);
+  assert.equal(timerAfterRestart.preferences.soundType, "school");
+  assert.ok(await worker.evaluate(() => chrome.alarms.get("focus-timer-wake")));
+  console.log("PASS: active timer and alarm restored across browser restart");
   console.log(
     "PASS: duplicate validation, reload persistence, responsive layout, text injection safety, deletion, safe return, browser restart persistence",
   );
+  assert.deepEqual(runtimeErrors, [], "No extension runtime errors");
   console.log(
     "All extension browser checks passed. Screenshots: test-results/",
   );

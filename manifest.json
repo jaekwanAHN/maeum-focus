@@ -5,10 +5,25 @@
   "version": "1.0.0",
   "description": "무심코 연 사이트 앞에서 잠깐 멈춤. 내가 쓴 한 문장으로 다시 집중하는 사이트 차단 도구.",
   "minimum_chrome_version": "120",
-  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
-  "host_permissions": ["http://*/*", "https://*/*"],
-  "background": { "service_worker": "src/background.js", "type": "module" },
-  "action": { "default_popup": "popup.html", "default_title": "다시, 여기" },
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess",
+    "alarms",
+    "notifications",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "다시, 여기"
+  },
   "options_page": "options.html",
   "icons": {
     "16": "assets/icon-16.png",
@@ -17,7 +32,15 @@
     "128": "assets/icon-128.png"
   },
   "web_accessible_resources": [
-    { "resources": ["blocked.html"], "matches": ["http://*/*", "https://*/*"] }
+    {
+      "resources": [
+        "blocked.html"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"

@@ -1,3 +1,4 @@
+import { handleTimer, isTimerAlarm } from "./timer-background.js";
 import {
   defaults,
   readState,
@@ -49,6 +50,7 @@ async function initialize() {
   const state = stored === undefined ? defaults() : readState(stored);
   await syncRules(state);
   if (stored === undefined) await chrome.storage.local.set({ settings: state });
+  await handleTimer();
   await badge(state);
   await redirectOpenTabs(state);
 }
@@ -68,6 +70,7 @@ chrome.runtime.onMessage.addListener((action, sender, respond) => {
   )
     return false;
   serial(async () => {
+    if (action.type?.startsWith("timer:")) return handleTimer(action);
     const before = await load();
     if (action.type === "getState") return before;
     const next = reduceState(before, action);
@@ -92,3 +95,9 @@ chrome.runtime.onMessage.addListener((action, sender, respond) => {
     );
   return true;
 });
+
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (isTimerAlarm(alarm)) serial(() => handleTimer()).catch(console.error);
+});
+// Reconcile durable deadlines whenever the service worker starts.
+serial(() => handleTimer()).catch(console.error);

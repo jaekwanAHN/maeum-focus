@@ -1350,3 +1350,27 @@ textarea::placeholder {
     transition: none !important;
   }
 }
+
+/* Shared timer controls for the popup and settings page. */
+.timer-panel { margin: 22px 0; padding: 24px; }
+.timer-panel h2 { font-size: 20px; margin: 0 0 6px; }
+.timer-panel h3 { font-size: 16px; margin: 0 0 12px; }
+.timer-panel .section-top { margin-bottom: 16px; }
+.timer-status { font-weight: 600; margin: 12px 0; color: #535c44; }
+.timer-clock { font-size: 30px; font-variant-numeric: tabular-nums; margin: 8px 0 16px; }
+.timer-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border: 0; padding: 0; margin: 0; }
+.timer-panel label { font-size: 12px; display: grid; gap: 6px; min-width: 0; }
+.timer-panel select, .timer-panel input[type="number"], .timer-panel input[type="time"] { width: 100%; min-width: 0; box-sizing: border-box; border: 1px solid #d9d9cf; background: #fffdf8; color: #34382e; border-radius: 8px; padding: 10px; font: inherit; font-size: 15px; }
+.timer-actions { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.timer-actions .button { padding: 10px 14px; font-size: 13px; }
+.timer-help { font-size: 12px; line-height: 1.7; color: #727568; margin: 12px 0; overflow-wrap: anywhere; }
+.timer-settings { border-top: 1px solid #e6e5dc; margin-top: 18px; padding-top: 14px; }
+.timer-settings summary { cursor: pointer; font-size: 13px; }
+.timer-settings form { display: grid; gap: 14px; padding-top: 16px; }
+.timer-panel .timer-check { display: flex; align-items: center; gap: 8px; }
+.timer-check input { accent-color: #777d60; }
+.timer-volume input { width: 100%; accent-color: #777d60; }
+.timer-alarm { border-top: 1px solid #e6e5dc; margin-top: 18px; padding-top: 18px; }
+.popup-page .timer-panel { padding: 18px; margin: 14px 0; }
+.timer-panel [hidden] { display: none !important; }
+.timer-panel button:disabled { opacity: .55; cursor: default; }
